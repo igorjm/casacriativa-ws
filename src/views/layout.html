@@ -15,11 +15,11 @@
   </head>
   <body id="{{bodyId}}">
     <div id="container">
-      {{% block content %}} {{% endblock %}}
+      {% block content %} {% endblock %}
     </div>
 
-    {{% include "modal.html" %}}
+    {% include "modal.html" %}
 
-    <script src="script.js"></script>
+    <script src="../script.js"></script>
   </body>
 </html>

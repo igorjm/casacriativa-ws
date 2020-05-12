@@ -2,9 +2,9 @@ const express = require('express');
 const server = express();
 const nunjucks = require('nunjucks');
 
-server.use(express.static('public'));
+server.use(express.static('./src/public'));
 
-nunjucks.configure('views', {
+nunjucks.configure('./src/views', {
   express: server,
   noCache: true,
 });
@@ -37,4 +37,4 @@ server.get('/ideias', function (req, res) {
   return res.render('ideias.html', { ideas: reverserdIdeas });
 });
 
-server.listen(3333);
+server.listen(3000);
