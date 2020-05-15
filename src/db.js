@@ -21,15 +21,26 @@ db.serialize(function () {
   ) VALUES(
     ?, ?, ?, ?, ?
   );`;
+
   db.run(query, values, function (err) {
     if (err) return console.log(err);
 
     console.log(this);
   });
 
-  //LIST DATA
-
-  //EDIT DATA
-
   //REMOVE DATA
+  db.run(`DELETE FROM ideas WHERE id = ?`, [1], function (err) {
+    if (err) return console.log(err);
+
+    console.log(this);
+  });
+
+  //LIST DATA
+  db.all(`SELECT * FROM ideas`, function (err, rows) {
+    if (err) return console.log(err);
+
+    console.log(rows);
+  });
 });
+
+module.exports = db;

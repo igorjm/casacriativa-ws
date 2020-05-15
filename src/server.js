@@ -1,10 +1,12 @@
 const express = require('express');
 const server = express();
 const nunjucks = require('nunjucks');
+const db = require('./db');
 
-server.use(express.static('./src/public'));
+server.use(express.static('public'));
+server.use(express.urlencoded({ extended: true }));
 
-nunjucks.configure('./src/views', {
+nunjucks.configure('views', {
   express: server,
   noCache: true,
 });
@@ -20,21 +22,59 @@ const ideas = [
 ];
 
 server.get('/', function (req, res) {
-  const reverserdIdeas = [...ideas].reverse();
-  const lastIdeas = [];
-
-  for (idea in reverserdIdeas) {
-    if (lastIdeas.length < 2) {
-      lastIdeas.push(idea);
+  db.all(`SELECT * FROM ideas`, function (err, rows) {
+    if (err) {
+      console.log(err);
+      return res.send('Erro no banco de dados!');
     }
-  }
-  return res.render('index.html', { ideas: lastIdeas });
+
+    const reverserdIdeas = [rows].reverse();
+    let lastIdeas = [];
+
+    for (idea in reverserdIdeas) {
+      if (lastIdeas.length < 2) {
+        lastIdeas.push(idea);
+      }
+    }
+    return res.render('index.html', { ideas: lastIdeas });
+  });
 });
 
 server.get('/ideias', function (req, res) {
-  const reverserdIdeas = [...ideas].reverse();
+  db.all(`SELECT * FROM ideas`, function (err, rows) {
+    if (err) {
+      console.log(err);
+      return res.send('Erro no banco de dados!');
+    }
 
-  return res.render('ideias.html', { ideas: reverserdIdeas });
+    const reverserdIdeas = [rows].reverse();
+
+    return res.render('ideias.html', { ideas: reverserdIdeas });
+  });
+});
+
+server.post('/', function (req, res) {
+  const values = [
+    req.body.image,
+    req.body.title,
+    req.body.category,
+    req.body.description,
+    req.body.link,
+  ];
+  const query = `INSERT INTO ideas (
+    image, title, category, description, link
+  ) VALUES(
+    ?, ?, ?, ?, ?
+  );`;
+
+  db.run(query, values, function (err) {
+    if (err) {
+      console.log(err);
+      return res.send('Erro no banco de dados!');
+    }
+
+    return res.redirect('/ideias');
+  });
 });
 
 server.listen(3000);
